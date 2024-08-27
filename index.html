@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Position</title>
+</head>
+<body>
+    <h1>Checking your registration status...</h1>
+    <p id="queuePosition">You are in the queue. Please wait...</p>
+
+    <script>
+        const userId = "user123"; // 실제 유저 ID 사용
+
+        function checkQueuePosition() {
+            fetch(`http://localhost:8080/queue_position?user_id=${userId}`)
+                .then(response => {
+                    if (response.status === 303) { // HTTP 303 See Other - 리다이렉트 상태 코드
+                        window.location.href = "http://localhost:3000/regist";
+                    } else if (response.status === 200) {
+                        return response.json();
+                    } else {
+                        throw new Error("Unexpected response status: " + response.status);
+                    }
+                })
+                .then(data => {
+                    if (data) {
+                        document.getElementById("queuePosition").textContent = `There are ${data.position} users ahead of you.`;
+                    }
+                })
+                .catch(error => console.error('Error checking queue position:', error));
+        }
+
+        setInterval(checkQueuePosition, 2000); // 2초마다 대기열 위치 확인
+    </script>
+</body>
+</html>
