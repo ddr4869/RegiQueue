@@ -8,6 +8,7 @@ import (
 
 	"github.com/ddr4869/RegiQueue/kafka"
 	"github.com/ddr4869/RegiQueue/redis"
+	"github.com/ddr4869/RegiQueue/service"
 )
 
 type QueuePositionResponse struct {
@@ -29,6 +30,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !service.CanEnroll(req.CourseName) {
+		http.Error(w, "Course is full", http.StatusBadRequest)
+		return
+	}
 	ctx := context.Background()
 
 	// marshal the request
@@ -38,7 +43,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Kafka에 메시지 전송
-	err = kafka.SendMessage("registration_topic", reqBytes)
+	err = kafka.SendMessage("registration_topic_1", reqBytes)
 	if err != nil {
 		http.Error(w, "Failed to send message to Kafka", http.StatusInternalServerError)
 		return
@@ -82,4 +87,9 @@ func GetQueuePosition(w http.ResponseWriter, r *http.Request) {
 	// 대기열 위치 반환
 	response := QueuePositionResponse{Position: position}
 	json.NewEncoder(w).Encode(response)
+}
+
+func CourseInfo(w http.ResponseWriter, r *http.Request) {
+	info := service.GetAllCourseInfo()
+	json.NewEncoder(w).Encode(info)
 }

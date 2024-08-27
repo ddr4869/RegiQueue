@@ -4,11 +4,11 @@ export let options = {
     scenarios: {
         constant_request_rate: {
             executor: 'constant-arrival-rate',
-            rate: 100,
+            rate: 1,
             timeUnit: '1s',
             duration: '10s',
-            preAllocatedVUs: 100,
-            maxVUs: 200,
+            preAllocatedVUs: 20,
+            maxVUs: 30,
         },
     },
 };

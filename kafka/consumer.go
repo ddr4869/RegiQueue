@@ -30,8 +30,6 @@ func ConsumeMessages(topic string) {
 	defer partitionConsumer.Close()
 
 	for message := range partitionConsumer.Messages() {
-		log.Printf("Received message: %s", string(message.Value))
-
 		var req service.RegistrationRequest
 		err := json.Unmarshal(message.Value, &req)
 		if err != nil {
@@ -42,9 +40,7 @@ func ConsumeMessages(topic string) {
 		// Process registration
 		success := service.ProcessRegistration(context.Background(), req)
 
-		if success {
-			log.Printf("Registration successful for user: %s, course: %s", req.UserID, req.CourseName)
-		} else {
+		if !success {
 			log.Printf("Registration failed for user: %s, course: %s", req.UserID, req.CourseName)
 		}
 

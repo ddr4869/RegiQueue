@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os/exec"
+
+	"github.com/ddr4869/RegiQueue/service"
 )
 
 type LoadTestRequest struct {
@@ -19,7 +21,7 @@ func RunLoadTest(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
-
+	service.RestoreCourseEnrollment()
 	// Prepare k6 command
 	cmd := exec.Command("k6", "run", "--vus", fmt.Sprintf("%d", req.Users), "--duration", req.Duration, "loadtest.js")
 

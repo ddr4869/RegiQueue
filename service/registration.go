@@ -14,8 +14,8 @@ type CourseInfo struct {
 }
 
 var courses = map[string]*CourseInfo{
-	"Math101": {Name: "Math101", Capacity: 50, Enrolled: 0},
-	"Eng201":  {Name: "Eng201", Capacity: 30, Enrolled: 0},
+	"Math101": {Name: "Math101", Capacity: 200, Enrolled: 0},
+	"Eng201":  {Name: "Eng201", Capacity: 300, Enrolled: 0},
 	// Add more courses as needed
 }
 
@@ -41,6 +41,23 @@ func ProcessRegistration(ctx context.Context, req RegistrationRequest) bool {
 		course.Enrolled++
 		return true
 	}
-
 	return false
+}
+
+func RestoreCourseEnrollment() {
+	for _, course := range courses {
+		course.Enrolled = 0
+	}
+}
+
+func GetAllCourseInfo() map[string]*CourseInfo {
+	return courses
+}
+
+func CanEnroll(courseName string) bool {
+	course, exists := courses[courseName]
+	if !exists {
+		return false
+	}
+	return course.Enrolled < course.Capacity
 }
