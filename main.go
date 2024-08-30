@@ -2,34 +2,28 @@ package main
 
 import (
 	"log"
-	"net/http"
 
-	"github.com/ddr4869/RegiQueue/handlers"
+	"github.com/ddr4869/RegiQueue/config"
+	"github.com/ddr4869/RegiQueue/internal"
 	"github.com/ddr4869/RegiQueue/kafka"
 	"github.com/ddr4869/RegiQueue/redis"
 )
 
 func main() {
-	// Redis 초기화
-	redis.InitRedis()
 
-	// Kafka 컨슈머를 별도의 고루틴으로 시작
-	kafka.InitProducer()
-	kafka.InitConsumer()
-	defer kafkaClose()
-	go kafka.ConsumeMessages("registration_topic_1")
+	cfg := config.Init()
+	redis.InitRedis(cfg.Redis.Address, cfg.Redis.Password)
+	kafka.InitProducer(cfg.Kafka.ProducerAddress)
+	kafka.InitConsumer(cfg.Kafka.ConsumerAddress)
+	defer func() {
+		kafka.CloseConsumer()
+		kafka.CloseProducer()
+	}()
 
-	// HTTP 핸들러 설정
-	http.HandleFunc("/register", handlers.Register)
-	http.HandleFunc("/queue_position", handlers.GetQueuePosition)
-	http.HandleFunc("/run_load_test", handlers.RunLoadTest)
-	http.HandleFunc("/course_info", handlers.CourseInfo)
-
-	log.Println("Server is running on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
-
-func kafkaClose() {
-	kafka.CloseConsumer()
-	kafka.CloseProducer()
+	go kafka.ConsumeMessages(cfg.Kafka.Topic)
+	router, err := internal.NewRestController(cfg)
+	if err != nil {
+		log.Fatalf("failed creating server: %v", err)
+	}
+	router.Start()
 }

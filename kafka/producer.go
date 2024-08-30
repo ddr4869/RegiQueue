@@ -8,9 +8,9 @@ import (
 
 var producer sarama.SyncProducer
 
-func InitProducer() error {
+func InitProducer(address string) error {
 	var err error
-	producer, err = sarama.NewSyncProducer([]string{"localhost:9092"}, nil)
+	producer, err = sarama.NewSyncProducer([]string{address}, nil)
 	if err != nil {
 		log.Fatal("Error creating consumer: ", err)
 	}

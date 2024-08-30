@@ -30,5 +30,5 @@ export default function () {
         },
     };
 
-    http.post('http://localhost:8080/register', payload, params);
+    http.post('http://localhost:8080/api/register', payload, params);
 }

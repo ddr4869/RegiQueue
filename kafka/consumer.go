@@ -5,17 +5,17 @@ import (
 	"encoding/json"
 	"log"
 
+	"github.com/ddr4869/RegiQueue/internal/service"
 	"github.com/ddr4869/RegiQueue/redis"
-	"github.com/ddr4869/RegiQueue/service"
 
 	"github.com/IBM/sarama"
 )
 
 var consumer sarama.Consumer
 
-func InitConsumer() error {
+func InitConsumer(address string) error {
 	var err error
-	consumer, err = sarama.NewConsumer([]string{"localhost:9092"}, nil)
+	consumer, err = sarama.NewConsumer([]string{address}, nil)
 	if err != nil {
 		log.Fatal("Error creating consumer: ", err)
 	}

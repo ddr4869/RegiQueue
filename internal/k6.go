@@ -1,12 +1,13 @@
-package handlers
+package internal
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os/exec"
 
-	"github.com/ddr4869/RegiQueue/service"
+	"github.com/ddr4869/RegiQueue/internal/dto"
+	"github.com/ddr4869/RegiQueue/internal/service"
+	"github.com/gin-gonic/gin"
 )
 
 type LoadTestRequest struct {
@@ -14,11 +15,12 @@ type LoadTestRequest struct {
 	Users    int    `json:"users"`
 }
 
-func RunLoadTest(w http.ResponseWriter, r *http.Request) {
+func (s *Server) RunLoadTest(c *gin.Context) {
+
 	var req LoadTestRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err := c.BindJSON(&req)
 	if err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+		dto.NewErrorResponse(c, http.StatusBadRequest, err, "Invalid request")
 		return
 	}
 	service.RestoreCourseEnrollment()
@@ -28,10 +30,9 @@ func RunLoadTest(w http.ResponseWriter, r *http.Request) {
 	// Run the command
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to run load test: %v", err), http.StatusInternalServerError)
+		dto.NewErrorResponse(c, http.StatusInternalServerError, err, "Failed to run load test")
 		return
 	}
-
 	// Return the output
-	w.Write(output)
+	dto.NewSuccessResponse(c, string(output))
 }

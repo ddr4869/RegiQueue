@@ -9,7 +9,7 @@ import (
 
 var rdb *redis.Client
 
-func InitRedis() {
+func InitRedis(address, password string) {
 	rdb = redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "1234",

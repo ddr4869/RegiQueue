@@ -14,8 +14,8 @@ type CourseInfo struct {
 }
 
 var courses = map[string]*CourseInfo{
-	"Math101": {Name: "Math101", Capacity: 200, Enrolled: 0},
-	"Eng201":  {Name: "Eng201", Capacity: 300, Enrolled: 0},
+	"Math101": {Name: "Math101", Capacity: 20000, Enrolled: 0},
+	"Eng201":  {Name: "Eng201", Capacity: 30000, Enrolled: 0},
 	// Add more courses as needed
 }
 
